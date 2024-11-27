@@ -3,4 +3,8 @@ name = "advent-of-code"
 version = "0.1.0"
 edition = "2021"
 
+[profile.dev]
+incremental= true
+
 [dependencies]
+polars = { version = "0.44.2", features = ["polars-io"] }
