@@ -8,14 +8,14 @@ fn read_csv<P: AsRef<Path>>(filename: P) -> Result<Vec<String>, Box<dyn Error>> 
     let file = File::open(filename)?;
     let mut rdr = csv::Reader::from_reader(file);
 
-    let mut numbers = Vec::new();
+    let mut lines = Vec::new();
 
     for result in rdr.records() {
         let record = result?;
-        numbers.push(StringRecord::as_slice(&record).to_owned())
+        lines.push(StringRecord::as_slice(&record).to_owned())
     }
 
-    Ok(numbers)
+    Ok(lines)
 }
 
 
@@ -38,12 +38,12 @@ fn main() -> Result<(), Box<dyn Error>>  {
     my_map.push(("nine", "9"));
 
 
-    for mut line in lines {
+    for line in lines {
         let mut first_number = "".to_owned();
         
         let mut last_number = "".to_owned();
 
-        // forward search for first character
+        // forward search for first number
         for i in 0..=line.len() {
             let mut partial_line = line[..i].to_owned();
             for (key, value) in &my_map {
@@ -59,7 +59,7 @@ fn main() -> Result<(), Box<dyn Error>>  {
                 }
         }
 
-        // backward search for last character
+        // backward search for last number
         for i in 0..=line.len() {
             let mut partial_line = line[line.len() - i ..].to_owned();
             for (key, value) in &my_map {
