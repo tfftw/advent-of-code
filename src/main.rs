@@ -1,32 +1,30 @@
 use std::error::Error;
 use std::fs::File;
 use std::path::Path;
-use csv::StringRecord;
-use regex::Regex;
+use std::fs::read_to_string;
 
-fn read_csv<P: AsRef<Path>>(filename: P) -> Result<Vec<String>, Box<dyn Error>> {
-    let file = File::open(filename)?;
-    let mut rdr = csv::Reader::from_reader(file);
+fn read_lines(filename: &str, sep: String) -> Vec<Vec<String>> {
+    let mut result = Vec::new();
 
-    let mut lines = Vec::new();
-
-    for result in rdr.records() {
-        let record = result?;
-        lines.push(StringRecord::as_slice(&record).to_owned())
+    for line in read_to_string(filename).unwrap().lines() {
+        result.push(line.split(&sep).map(|s| s.to_string()).collect::<Vec<_>>())
     }
 
-    Ok(lines)
+    result
 }
 
 
 
 fn main() -> Result<(), Box<dyn Error>>  {
-    let filename = "../input_advent/input_1.txt";
-    let lines = read_csv(filename)?;
-    let re = Regex::new(r"[A-Za-z]").unwrap();
+    let rules = read_lines("../input_advent/input_2024_05_00.txt", '|'.to_string());
+    let codes = read_lines("../input_advent/input_2024_05_01.txt", ','.to_string());
+    println!("{:?}", rules);
+    println!("{:?}", codes);
+    /*
 
     let mut answers = Vec::new();
     let mut my_map = Vec::new();
+ 
     my_map.push(("one", "1"));
     my_map.push(("two", "2"));
     my_map.push(("three", "3"));
@@ -80,10 +78,10 @@ fn main() -> Result<(), Box<dyn Error>>  {
 
     }
 
-
     println!("{:?}", answers);
     let sum: i32  = answers.iter().sum();
 
     println!("{:?}", sum);
+    */
     Ok(())
 }
