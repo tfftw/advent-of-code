@@ -13,75 +13,61 @@ fn read_lines(filename: &str, sep: String) -> Vec<Vec<String>> {
     result
 }
 
+fn check_code(code: &Vec<String>, rule: &Vec<String>) -> bool {
+    let mut second_number_found = false;
+    let mut correct = true;
+    for number in code {
+        if number == &rule[1]{
+            second_number_found = true;
+        }
+        else if number == &rule[0]{
+            if second_number_found
+            {correct = false}
+            else {
+                break}
+        }
+
+    }
+
+    correct
+}
+
 
 
 fn main() -> Result<(), Box<dyn Error>>  {
     let rules = read_lines("../input_advent/input_2024_05_00.txt", '|'.to_string());
     let codes = read_lines("../input_advent/input_2024_05_01.txt", ','.to_string());
-    println!("{:?}", rules);
-    println!("{:?}", codes);
-    /*
-
-    let mut answers = Vec::new();
-    let mut my_map = Vec::new();
- 
-    my_map.push(("one", "1"));
-    my_map.push(("two", "2"));
-    my_map.push(("three", "3"));
-    my_map.push(("four", "4"));
-    my_map.push(("five", "5"));
-    my_map.push(("six", "6"));
-    my_map.push(("seven", "7"));
-    my_map.push(("eight", "8"));
-    my_map.push(("nine", "9"));
 
 
-    for line in lines {
-        let mut first_number = "".to_owned();
-        
-        let mut last_number = "".to_owned();
+    let mut codes_to_check: Vec<Vec<String>> = Vec::new();
+    let mut codes_to_check_next_time = codes.clone();
 
-        // forward search for first number
-        for i in 0..=line.len() {
-            let mut partial_line = line[..i].to_owned();
-            for (key, value) in &my_map {
-                partial_line = partial_line.replace(key, value);
-            }
-
-            let numbers_in_line = re.replace_all(&partial_line, "");
-
-            if numbers_in_line.len() == 1
-                {
-                first_number = numbers_in_line[..1].to_string();
-                break;
-                }
+    for rule in rules {
+        codes_to_check = codes_to_check_next_time.clone();
+        codes_to_check_next_time = Vec::new();
+        println!("{:?}", codes_to_check.len());
+        for code in codes_to_check{
+    
+            let check = check_code(&code, &rule);
+    
+            if check{
+                codes_to_check_next_time.push(code)
+            };
         }
-
-        // backward search for last number
-        for i in 0..=line.len() {
-            let mut partial_line = line[line.len() - i ..].to_owned();
-            for (key, value) in &my_map {
-                partial_line = partial_line.replace(key, value);
-            }
-
-            let numbers_in_line = re.replace_all(&partial_line, "");
-
-            if numbers_in_line.len() == 1
-                {
-                last_number = numbers_in_line[..1].to_string();
-                break;
-                }
-        }
-        
-        let answer = first_number.to_owned() + &last_number;
-        answers.push(answer.parse::<i32>().unwrap());
-
     }
 
-    println!("{:?}", answers);
-    let sum: i32  = answers.iter().sum();
+    // Select middle number
+    let mut selected_numbers: Vec<i32> = Vec::new();
+    for code in codes_to_check_next_time{
+        selected_numbers.push(code[(code.len() - 1)/2].parse::<i32>().unwrap())
+    }
+
+    println!("{:?}", selected_numbers);
+
+
+    let sum: i32   = selected_numbers.iter().sum();
 
     println!("{:?}", sum);
-    */
+
     Ok(())
 }
