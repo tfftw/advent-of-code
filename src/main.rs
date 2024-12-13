@@ -4,16 +4,6 @@ use std::path::Path;
 use std::fs::read_to_string;
 use std::collections::HashMap;
 
-fn read_lines(filename: &str, sep: String) -> Vec<Vec<String>> {
-    let mut result = Vec::new();
-
-    for line in read_to_string(filename).unwrap().lines() {
-        result.push(line.split(&sep).map(|s| s.to_string()).collect::<Vec<_>>())
-    }
-
-    result
-}
-
 fn apply_rules(stone: &i64) -> Vec<i64> {
 
     let mut new_stones = Vec::new();
