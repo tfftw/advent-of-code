@@ -14,105 +14,57 @@ fn read_lines(filename: &str, sep: String) -> Vec<Vec<String>> {
     result
 }
 
-fn check_code(code: &Vec<String>, rule: &Vec<String>) -> bool {
-    let mut second_number_found = false;
-    let mut correct = true;
-    for number in code {
-        if number == &rule[1]{
-            second_number_found = true;
-        }
-        else if number == &rule[0]{
-            if second_number_found
-            {correct = false}
-            else {
-                break}
-        }
+fn apply_rules(stone: &i64) -> Vec<i64> {
 
+    let mut new_stones = Vec::new();
+    let stone_as_string = stone.to_string();
+    let string_length = stone_as_string.len();
+    if *stone == 0{
+        new_stones.push(1);
     }
+    else if string_length % 2 == 0{
+        new_stones.push(stone_as_string.get(..string_length/2).unwrap().parse::<i64>().unwrap());
+        new_stones.push(stone_as_string.get(string_length/2..).unwrap().parse::<i64>().unwrap())
+    }
+    else {
 
-    correct
+        new_stones.push(stone*2024)}
+
+
+    new_stones
 }
 
-fn correct_code(code: &Vec<String>, rules: &Vec<Vec<String>>) -> (Vec<String>, bool){
+fn len_after_iterations(stone: &i64, iterations: &i64, register: &mut HashMap<(i64, i64), i64>) -> i64 {
+    let mut len = 0;
 
-    let mut temp_code = code.clone();
-
-    let mut new_code: Vec<String>;
-    let mut corrected_anything_at_all = false;
-    while true{
-        let mut corrected_something = false;
-        for rule in rules{
-            if !check_code(&temp_code, rule){
-                // Fix code
-                new_code = Vec::new();
-
-                for number in &temp_code {
-                    if *number == rule[1]{
-                        new_code.push(rule[0].clone());
-                    }
-                    else if *number == rule[0]{
-                        new_code.push(rule[1].clone());
-                    }
-                    else {
-                        new_code.push(number.to_string())
-                    }            
-                }
-                temp_code = new_code.clone();
-                corrected_something = true;
-                corrected_anything_at_all = true
+    match register.get(&(*stone, *iterations)) {
+        Some(value) => 
+        {len = *value;},
+        None => 
+    if *iterations != 0{
+        let new_stones = apply_rules(stone);
+        for new_stone in new_stones{
+            len += len_after_iterations(&new_stone, &(iterations - 1), register)
         }
+        register.insert((*stone, *iterations), len);
     }
-        if !corrected_something{
-            break}
-    }
-
-    (temp_code, corrected_anything_at_all)
+    else{len = 1}}
+    
+    len
 }
 
 
-
-fn main() -> Result<(), Box<dyn Error>>  {
-    let mut rules = read_lines("../input_advent/input_2024_05_00.txt", '|'.to_string());
-    let codes = read_lines("../input_advent/input_2024_05_01.txt", ','.to_string());
-
-    let mut codes_to_check = codes.clone();
-    let mut corrected_codes: Vec<Vec<String>> = Vec::new();
-    let mut relevant_rules_per_code: HashMap<Vec<String>, Vec<Vec<String>>> = HashMap::new();
-
-    for code in codes{
-        let mut relevant_rules: Vec<Vec<String>> = Vec::new();
-        for rule in &rules{
-            if code.contains(&rule[0]) && code.contains(&rule[1]){
-                relevant_rules.push(rule.to_vec())}}
-
-        relevant_rules_per_code.insert(code.clone(), relevant_rules.clone());
+fn main() -> ()  {
+    let mut stones = vec![475449, 2599064, 213, 0, 2, 65, 5755, 51149];
+    let mut register : HashMap<(i64, i64), i64> = HashMap::new();
+    let num_iterations = 75;
+    let mut len = 0;
+    for stone in stones{
+        let len_of_stone = len_after_iterations(&stone, &num_iterations, &mut register);
+        println!("{:?}, {:?}", stone, len_of_stone);
+        len += len_of_stone
     }
 
-
-    for code in codes_to_check{
-        let relevant_rules = &relevant_rules_per_code[&code];
-        if relevant_rules.len() > 0{
-            let (corrected_code, corrected_anything_at_all) = correct_code(&code, relevant_rules);
-            if corrected_anything_at_all{corrected_codes.push(corrected_code)
-            }
-        }
-    }
-
-    println!("{:?}", corrected_codes.len());
-
-    // Select middle number
-    let mut selected_numbers: Vec<i32> = Vec::new();
-    for code in corrected_codes{
-        selected_numbers.push(code[(code.len() - 1)/2].parse::<i32>().unwrap())
-    }
-
-    println!("{:?}", selected_numbers);
-
-
-    let sum: i32   = selected_numbers.iter().sum();
-
-    println!("{:?}", sum);
-
-
-    Ok(())
+    println!("{:?}", len)
 }
+
