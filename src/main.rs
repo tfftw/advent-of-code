@@ -14,6 +14,27 @@ fn read_lines(filename: &str, sep: String) -> Vec<Vec<String>> {
     result
 }
 
+fn display_robots(num_robots: &i32, px: &HashMap<(i32), i32>, py: &HashMap<(i32), i32>){
+    let mut arr: [String; 103] = std::array::from_fn(|_| ".".repeat(101));
+    for robot in 0..*num_robots{
+        let robot_px = px.get(&robot).unwrap();
+        let robot_py = py.get(&robot).unwrap();
+        let mut chars: Vec<char> = arr[*robot_py as usize].chars().collect();
+
+        chars[*robot_px as usize] = 'o';
+    
+        // Convert the Vec<char> back to a String
+        let new_string: String = chars.into_iter().collect();
+
+        // Convert back to string and assign it to the array
+        arr[*robot_py as usize] = new_string;
+    }
+    println!(" ");
+    for line in arr{
+        println!{"{:?}", line}
+    }
+    println!(" ");
+}
 
 fn main() -> ()  {
     let input = read_lines("../input_advent/input_14.txt", ' '.to_string());
@@ -35,43 +56,17 @@ fn main() -> ()  {
         vy.insert(index.try_into().unwrap(), v[1].parse::<i32>().unwrap());
     }
 
-    // update 100 seconds
-    let gap = 100 ;
+    for iteration in 0..200{
+    let gap = 1 ;
     for robot in 0..num_robots{
         let new_px = (((px.get(&robot).unwrap() + gap*vx.get(&robot).unwrap()) % size_x) + size_x) % size_x; 
         let new_py = (((py.get(&robot).unwrap() + gap*(vy.get(&robot).unwrap())) % size_y) + size_y) % size_y; 
         px.insert(robot, new_px);
         py.insert(robot, new_py);
     }
-
-    let mut num_quadrant_left_down = 0;
-    let mut num_quadrant_right_down = 0;
-    let mut num_quadrant_left_up = 0;
-    let mut num_quadrant_right_up = 0;
-
-    println!("px : {:?}", px);
-    println!("py: {:?}", py);
-    for robot in 0..num_robots{
-        let left: bool = (*px.get(&robot).unwrap() <= (size_x - 3)/2);
-        let right: bool = (*px.get(&robot).unwrap() >= (size_x + 1)/2);
-        let down: bool = (*py.get(&robot).unwrap() <= (size_y - 3)/2);
-        let up: bool = (*py.get(&robot).unwrap() >= (size_y + 1)/2);
-
-        println!("{:?}, {:?}, {:?}, {:?}, {:?}", robot, left, down, right, up);
-        if left & down{
-            num_quadrant_left_down += 1
-        }
-        else if left& up {
-            num_quadrant_left_up += 1
-        }
-        else if down & right{
-            num_quadrant_right_down += 1
-        }
-        else if up & right{
-            num_quadrant_right_up += 1
-        }
+    println!("{:?}", iteration);
+    display_robots(&num_robots, &px, &py)
     }
-    println!("{:?}", num_quadrant_left_down + num_quadrant_left_up + num_quadrant_right_down + num_quadrant_right_up);
-    println!("{:?}", num_quadrant_left_down * num_quadrant_left_up * num_quadrant_right_down * num_quadrant_right_up)
+    
 }
 
