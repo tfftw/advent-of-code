@@ -29,11 +29,19 @@ fn display_robots(num_robots: &i32, px: &HashMap<(i32), i32>, py: &HashMap<(i32)
         // Convert back to string and assign it to the array
         arr[*robot_py as usize] = new_string;
     }
+    let mut adjacents_found = false;
+    for line in &arr{
+        if line.contains("ooooooo"){
+            adjacents_found = true;
+            break
+        }
+    }
+    if adjacents_found{
     println!(" ");
     for line in arr{
         println!{"{:?}", line}
     }
-    println!(" ");
+    println!(" ");}
 }
 
 fn main() -> ()  {
@@ -56,7 +64,7 @@ fn main() -> ()  {
         vy.insert(index.try_into().unwrap(), v[1].parse::<i32>().unwrap());
     }
 
-    for iteration in 0..200{
+    for iteration in 0..20000{
     let gap = 1 ;
     for robot in 0..num_robots{
         let new_px = (((px.get(&robot).unwrap() + gap*vx.get(&robot).unwrap()) % size_x) + size_x) % size_x; 
